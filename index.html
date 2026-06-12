@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard TJ AM — Estudos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #070B13;
+    --bg-surface: #0D1522;
+    --bg-card: #111B2E;
+    --bg-card-hover: #162238;
+    --border: rgba(212, 168, 67, 0.12);
+    --border-active: rgba(212, 168, 67, 0.35);
+    --gold: #D4A843;
+    --gold-light: #F0D080;
+    --gold-pale: rgba(212, 168, 67, 0.08);
+    --green: #1A8A4A;
+    --green-light: #2CC070;
+    --green-pale: rgba(26, 138, 74, 0.12);
+    --red: #D4444A;
+    --amber: #D4883A;
+    --text: #E8E6E0;
+    --text-secondary: #989488;
+    --text-muted: #6B675E;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg-deep);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Background texture ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% -20%, rgba(212, 168, 67, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 70% 50% at 20% 100%, rgba(26, 138, 74, 0.03) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(212, 168, 67, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 48px 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-family: var(--font-serif);
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--gold-light);
+  }
+
+  header h1 span {
+    display: block;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  header .meta {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  header .meta .date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Hero Stats ── */
+  .hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+
+  .hero-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .hero-card:hover {
+    border-color: var(--border-active);
+    background: var(--bg-card-hover);
+  }
+
+  .hero-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    opacity: 0.6;
+  }
+
+  .hero-card:nth-child(1)::after { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+  .hero-card:nth-child(2)::after { background: linear-gradient(90deg, var(--green), var(--green-light)); }
+  .hero-card:nth-child(3)::after { background: linear-gradient(90deg, #4A7BD4, #7AAFF0); }
+  .hero-card:nth-child(4)::after { background: linear-gradient(90deg, var(--red), #E07070); }
+
+  .hero-card .label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .hero-card .value {
+    font-family: var(--font-serif);
+    font-size: 2.8rem;
+    line-height: 1.1;
+    color: var(--text);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+  }
+
+  .hero-card .value.gold { color: var(--gold-light); }
+  .hero-card .value.green { color: var(--green-light); }
+  .hero-card .value.blue { color: #7AAFF0; }
+  .hero-card .value.red { color: #E07070; }
+
+  .hero-card .sub {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  /* ── Section Titles ── */
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .section-title h2 {
+    font-family: var(--font-serif);
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--gold-light);
+    letter-spacing: -0.01em;
+  }
+
+  .section-title .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 12px;
+    border-radius: 100px;
+    background: var(--gold-pale);
+    color: var(--gold);
+    border: 1px solid rgba(212, 168, 67, 0.2);
+  }
+
+  .section-title .badge.peso2 {
+    background: var(--green-pale);
+    color: var(--green-light);
+    border-color: rgba(26, 138, 74, 0.2);
+  }
+
+  /* ── Subject Grid ── */
+  .subject-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .subject-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    transition: border-color 0.3s, background 0.3s;
+    position: relative;
+  }
+
+  .subject-card:hover {
+    border-color: var(--border-active);
+    background: var(--bg-card);
+  }
+
+  .subject-card .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .subject-card .subject-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .subject-card .subject-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+    margin-left: 8px;
+  }
+
+  .tag-peso1 { background: var(--gold-pale); color: var(--gold); border: 1px solid rgba(212, 168, 67, 0.2); }
+  .tag-peso2 { background: var(--green-pale); color: var(--green-light); border: 1px solid rgba(26, 138, 74, 0.2); }
+
+  .subject-card .priority {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .subject-card .priority .alta { color: var(--red); }
+  .subject-card .priority .media { color: var(--amber); }
+
+  /* ── Progress Bar ── */
+  .progress-wrap {
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 100px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+
+  .progress-bar-fill.green-fill {
+    background: linear-gradient(90deg, var(--green), var(--green-light));
+  }
+
+  .progress-bar-fill.amber-fill {
+    background: linear-gradient(90deg, var(--amber), var(--gold));
+  }
+
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .subject-card .missing {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .subject-card .missing summary {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .subject-card .missing summary::-webkit-details-marker { display: none; }
+  .subject-card .missing summary::after {
+    content: '+';
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+  .subject-card .missing[open] summary::after {
+    content: '−';
+  }
+
+  .subject-card .missing ul {
+    list-style: none;
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .subject-card .missing li {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.03);
+    padding: 2px 10px;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* ── Revisão ── */
+  .revisao-section {
+    margin-bottom: 48px;
+  }
+
+  .revisao-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .revisao-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: border-color 0.3s;
+    position: relative;
+  }
+
+  .revisao-card:hover {
+    border-color: var(--border-active);
+  }
+
+  .revisao-card .days {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+  }
+
+  .revisao-card .topic-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .revisao-card .taxa {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+  }
+
+  .revisao-card .bar-small {
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 100px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .revisao-card .bar-small .fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+
+  .revisao-card .urgent .fill { background: linear-gradient(90deg, var(--red), #E07070); }
+  .revisao-card .warning .fill { background: linear-gradient(90deg, var(--amber), var(--gold)); }
+
+  /* ── Timeline ── */
+  .timeline-section {
+    margin-bottom: 56px;
+  }
+
+  .timeline-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 140px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .timeline-bar {
+    flex: 1;
+    min-width: 8px;
+    border-radius: 4px 4px 0 0;
+    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    transition: height 0.6s ease;
+    position: relative;
+    opacity: 0.75;
+  }
+
+  .timeline-bar:hover {
+    opacity: 1;
+  }
+
+  .timeline-bar .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    margin-bottom: 6px;
+  }
+
+  .timeline-bar:hover .tooltip { opacity: 1; }
+
+  .timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .timeline-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 40px 0;
+  }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    padding: 32px 0 48px;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  footer a {
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  footer a:hover { text-decoration: underline; }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-card, .subject-card, .revisao-card {
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-card:nth-child(1) { animation-delay: 0.05s; }
+  .hero-card:nth-child(2) { animation-delay: 0.1s; }
+  .hero-card:nth-child(3) { animation-delay: 0.15s; }
+  .hero-card:nth-child(4) { animation-delay: 0.2s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-card, .subject-card, .revisao-card { animation: none; }
+    .progress-bar-fill { transition: none; }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr 1fr; }
+    .subject-grid { grid-template-columns: 1fr; }
+    .revisao-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 600px) {
+    .hero { grid-template-columns: 1fr; }
+    .revisao-grid { grid-template-columns: 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 8px; }
+    header .meta { text-align: left; }
+    .container { padding: 0 16px; }
+    .hero-card .value { font-size: 2.2rem; }
+  }
+
+  /* ── Extra ── */
+  .empty-state {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 24px;
+    font-size: 0.85rem;
+  }
+
+  .no-questions {
+    display: inline-block;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.03);
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ═══ HEADER ═══ -->
+  <header>
+    <div>
+      <h1>
+        TJ AM — Estudos
+        <span>Dashboard de Preparação</span>
+      </h1>
+    </div>
+    <div class="meta">
+      96.6% taxa geral<br>
+      <span class="date">Atualizado em 12/06/2026</span>
+    </div>
+  </header>
+
+  <!-- ═══ HERO ═══ -->
+  <div class="hero">
+    <div class="hero-card">
+      <div class="label">Questões Resolvidas</div>
+      <div class="value gold">89</div>
+      <div class="sub">86 acertos · 96.6% taxa</div>
+    </div>
+    <div class="hero-card">
+      <div class="label">Matérias em Estudo</div>
+      <div class="value green">13</div>
+      <div class="sub">91 assuntos cadastrados</div>
+    </div>
+    <div class="hero-card">
+      <div class="label">Recursos Salvos</div>
+      <div class="value blue">93</div>
+      <div class="sub">86 links · 7 anotações</div>
+    </div>
+    <div class="hero-card">
+      <div class="label">Último Estudo</div>
+      <div class="value red">Hoje</div>
+      <div class="sub">12/06/2026 · sequência ativa 🔥</div>
+    </div>
+  </div>
+
+  <!-- ═══ P1 — CONHECIMENTOS BÁSICOS ═══ -->
+  <div class="section-title">
+    <h2>Conhecimentos Básicos</h2>
+    <span class="badge">Peso 1 · 43 questões na prova</span>
+  </div>
+  <div class="subject-grid">
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Língua Portuguesa</div>
+        <span class="subject-tag tag-peso1">Peso 1</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 13 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:54%"></div></div>
+        <div class="progress-stats">
+          <span>7 / 13 assuntos</span>
+          <span>— questões</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>6 assuntos pendentes</summary>
+        <ul>
+          <li>Interpretação e Compreensão de Texto</li>
+          <li>Concordância Verbal e Nominal</li>
+          <li>Regência Verbal e Nominal</li>
+          <li>Ortografia e Acentuação</li>
+          <li>Pontuação</li>
+          <li>Reescritura de Frases</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Raciocínio Lógico-Matemático</div>
+        <span class="subject-tag tag-peso1">Peso 1</span>
+      </div>
+      <div class="priority">Prioridade <span class="media">MÉDIA</span> · 5 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill amber-fill" style="width:71%"></div></div>
+        <div class="progress-stats">
+          <span>5 / 7 assuntos</span>
+          <span>— questões</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>2 assuntos pendentes</summary>
+        <ul>
+          <li>Raciocínio Analítico e Sequencial</li>
+          <li>Probabilidade e Análise Combinatória</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Geografia e História do Amazonas</div>
+        <span class="subject-tag tag-peso1">Peso 1</span>
+      </div>
+      <div class="priority">Prioridade <span class="media">MÉDIA</span> · 5 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill amber-fill" style="width:50%"></div></div>
+        <div class="progress-stats">
+          <span>3 / 6 assuntos</span>
+          <span>— questões</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>3 assuntos pendentes</summary>
+        <ul>
+          <li>Aspectos Físicos (Clima, Relevo, Hidrografia)</li>
+          <li>Ocupação e Povoamento</li>
+          <li>História do Amazonas</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Noções de Informática e Processo Digital</div>
+        <span class="subject-tag tag-peso1">Peso 1</span>
+      </div>
+      <div class="priority">Prioridade <span class="media">MÉDIA</span> · 5 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill amber-fill" style="width:57%"></div></div>
+        <div class="progress-stats">
+          <span>4 / 7 assuntos</span>
+          <span>— questões</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>3 assuntos pendentes</summary>
+        <ul>
+          <li>Conceitos Básicos de Informática</li>
+          <li>Internet e Navegação</li>
+          <li>Processo Judicial Eletrônico (PJe)</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Legislação Institucional e do Poder Judiciário</div>
+        <span class="subject-tag tag-peso1">Peso 1</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 10 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:33%"></div></div>
+        <div class="progress-stats">
+          <span>2 / 6 assuntos</span>
+          <span>20 questões · 100% acerto</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>4 assuntos pendentes</summary>
+        <ul>
+          <li>REGIMENTO INTERNO DO TJ AM (REGINT)</li>
+          <li>Estrutura e Organização do TJ AM</li>
+          <li>Competências dos Órgãos Julgadores</li>
+          <li>Lei de Organização Judiciária do Amazonas</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Direitos da Pessoa com Deficiência (Acessibilidade)</div>
+        <span class="subject-tag tag-peso1">Peso 1</span>
+      </div>
+      <div class="priority">Prioridade <span class="media">MÉDIA</span> · 5 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <div class="progress-stats">
+          <span>0 / 2 assuntos</span>
+          <span>— questões</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>2 assuntos pendentes</summary>
+        <ul>
+          <li>Lei Brasileira de Inclusão (LBI - Lei 13.146/2015)</li>
+          <li>Acessibilidade nos Órgãos Públicos</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <!-- ═══ P2 — CONHECIMENTOS ESPECÍFICOS ═══ -->
+  <div class="section-title">
+    <h2>Conhecimentos Específicos</h2>
+    <span class="badge peso2">Peso 2 · 57 questões na prova</span>
+  </div>
+  <div class="subject-grid">
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Noções de Direito Constitucional</div>
+        <span class="subject-tag tag-peso2">Peso 2</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 12 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill green-fill" style="width:100%"></div></div>
+        <div class="progress-stats">
+          <span>8 / 8 assuntos ✅</span>
+          <span>24 questões · 100% acerto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Noções de Direito Administrativo</div>
+        <span class="subject-tag tag-peso2">Peso 2</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 12 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill green-fill" style="width:78%"></div></div>
+        <div class="progress-stats">
+          <span>7 / 9 assuntos</span>
+          <span>10 questões · 100% acerto</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>2 assuntos pendentes</summary>
+        <ul>
+          <li>Responsabilidade Civil do Estado</li>
+          <li>Processo Administrativo (Lei 9.784/99)</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Direito Processual Civil</div>
+        <span class="subject-tag tag-peso2">Peso 2</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 12 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill green-fill" style="width:73%"></div></div>
+        <div class="progress-stats">
+          <span>8 / 11 assuntos</span>
+          <span>— questões</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>3 assuntos pendentes</summary>
+        <ul>
+          <li>Atos Processuais</li>
+          <li>Sentença e Coisa Julgada</li>
+          <li>Cumprimento de Sentença</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Direito Processual Penal</div>
+        <span class="subject-tag tag-peso2">Peso 2</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 10 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill green-fill" style="width:64%"></div></div>
+        <div class="progress-stats">
+          <span>7 / 11 assuntos</span>
+          <span>15 questões · 93.3% acerto</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>4 assuntos pendentes</summary>
+        <ul>
+          <li>Princípios do Processo Penal</li>
+          <li>Provas no Processo Penal</li>
+          <li>Medidas Cautelares e Prisão</li>
+          <li>Conexão e Continência</li>
+        </ul>
+      </details>
+    </div>
+
+    <div class="subject-card">
+      <div class="top-row">
+        <div class="subject-name">Noções de Administração (Geral e Pública)</div>
+        <span class="subject-tag tag-peso2">Peso 2</span>
+      </div>
+      <div class="priority">Prioridade <span class="alta">ALTA</span> · 11 questões</div>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill green-fill" style="width:67%"></div></div>
+        <div class="progress-stats">
+          <span>4 / 6 assuntos</span>
+          <span>20 questões · 90% acerto</span>
+        </div>
+      </div>
+      <details class="missing">
+        <summary>2 assuntos pendentes</summary>
+        <ul>
+          <li>Gestão de Pessoas</li>
+          <li>Gestão de Recursos Financeiros e Materiais</li>
+        </ul>
+      </details>
+    </div>
+  </div>
+
+  <!-- ═══ REVISÃO ESPAÇADA ═══ -->
+  <div class="revisao-section">
+    <div class="section-title">
+      <h2>Revisão Espaçada</h2>
+      <span class="badge">Prioridade</span>
+    </div>
+    <div class="revisao-grid">
+      <div class="revisao-card">
+        <div class="days">48 dias</div>
+        <div class="topic-name">Juiz das Garantias</div>
+        <div class="taxa">93.3% taxa · última 25/04</div>
+        <div class="bar-small urgent"><div class="fill" style="width:100%"></div></div>
+      </div>
+      <div class="revisao-card">
+        <div class="days">36 dias</div>
+        <div class="topic-name">Poderes Administrativos</div>
+        <div class="taxa">100% taxa · última 07/05</div>
+        <div class="bar-small urgent"><div class="fill" style="width:100%"></div></div>
+      </div>
+      <div class="revisao-card">
+        <div class="days">3 dias</div>
+        <div class="topic-name">REGINT — TJAM</div>
+        <div class="taxa">100% taxa · última 09/06</div>
+        <div class="bar-small"><div class="fill" style="width:20%"></div></div>
+      </div>
+      <div class="revisao-card">
+        <div class="days">1 dia</div>
+        <div class="topic-name">Poder Judiciário</div>
+        <div class="taxa">100% taxa · última 10/06</div>
+        <div class="bar-small"><div class="fill" style="width:10%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TIMELINE ═══ -->
+  <div class="timeline-section">
+    <div class="section-title">
+      <h2>Atividade Recente</h2>
+      <span class="badge">8 sessões</span>
+    </div>
+    <div class="timeline-wrap" id="timeline"></div>
+    <div class="timeline-labels">
+      <span>19 Abr</span>
+      <span>23 Abr</span>
+      <span>24 Abr</span>
+      <span>25 Abr</span>
+      <span>07 Mai</span>
+      <span>09 Jun</span>
+      <span>10 Jun</span>
+      <span>12 Jun</span>
+    </div>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer>
+    TJ AM — Tribunal de Justiça do Amazonas · Banca CEBRASPE (Cespe)<br>
+    <a href="https://github.com/otsemagencia-hub/tjam-dashboard" target="_blank">otsemagencia-hub/tjam-dashboard</a> · Dados do LearnGEN
+  </footer>
+
+</div>
+
+<script>
+  // ── Timeline Bars ──
+  const timelineData = [
+    { date: '19 Abr', qtd: 10, acertos: 10 },
+    { date: '23 Abr', qtd: 10, acertos: 10 },
+    { date: '24 Abr', qtd: 12, acertos: 12 },
+    { date: '25 Abr', qtd: 15, acertos: 14 },
+    { date: '07 Mai', qtd: 10, acertos: 10 },
+    { date: '09 Jun', qtd: 10, acertos: 10 },
+    { date: '10 Jun', qtd: 12, acertos: 12 },
+    { date: '12 Jun', qtd: 10, acertos: 8 },
+  ];
+
+  const maxQtd = Math.max(...timelineData.map(d => d.qtd));
+  const timeline = document.getElementById('timeline');
+
+  timelineData.forEach(d => {
+    const pct = (d.qtd / maxQtd) * 100;
+    const acertoPct = (d.acertos / d.qtd) * 100;
+    const bar = document.createElement('div');
+    bar.className = 'timeline-bar';
+    bar.style.height = pct + '%';
+    bar.innerHTML = `
+      <div class="tooltip">${d.qtd} questões · ${d.acertos} acertos (${Math.round(acertoPct)}%)</div>
+    `;
+    timeline.appendChild(bar);
+  });
+
+  // ── Animate progress bars on load ──
+  // (already set in HTML, but re-trigger for smoothness)
+  document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0%';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        bar.style.width = w;
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
